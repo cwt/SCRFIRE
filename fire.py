@@ -22,14 +22,33 @@ def main(screen):
             for _ in range(width // 9):
                 b[random.randint(0, width - 1) + width * (height - 1)] = 65
 
-            # Calculate new buffer values
+            # Calculate new buffer values for fire effect
             for i in range(size):
+                # Average the current value with its right, bottom, and bottom-right neighbors
                 b[i] = (b[i] + b[i + 1] + b[i + width] + b[i + width + 1]) // 4
-                color = 4 if b[i] > 15 else (3 if b[i] > 9 else (2 if b[i] > 4 else 1))
 
+                # Determine the color based on the intensity
+                if b[i] > 15:
+                    color = 4  # White
+                elif b[i] > 9:
+                    color = 3  # Yellow
+                elif b[i] > 4:
+                    color = 2  # Red
+                else:
+                    color = 1  # Black
+
+                # Only update cells that are not on the bottom row of the screen
                 if i < size - width:
-                    screen.addstr(i // width, i % width, char[min(b[i], 9)], 
-                                  curses.color_pair(color) | curses.A_BOLD)
+                    # Calculate the row and column position
+                    row = i // width
+                    col = i % width
+
+                    # Get the character corresponding to the current intensity
+                    char_index = min(b[i], 9)
+                    fire_char = char[char_index]
+
+                    # Add the character to the screen with the determined color
+                    screen.addstr(row, col, fire_char, curses.color_pair(color) | curses.A_BOLD)
 
             screen.refresh()
             screen.timeout(30)
